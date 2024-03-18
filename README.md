@@ -4,6 +4,8 @@
 
 This project contains a web map built with Mapbox GL JS and turf.js showing Toronto's collision data in a hexbin map. Collision point data was aggregated into each bin and displayed on the map.
 
+Please access the web map [here](https://mia0204.github.io/ggr472-lab4/).
+
 ## Data Sources
 
 [Motor Vehicle Collisions involving Killed or Seriously Injured Persons (Toronto Open Data Portal)](https://open.toronto.ca/dataset/motor-vehicle-collisions-involving-killed-or-seriously-injured-persons/)
