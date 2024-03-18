@@ -17,6 +17,21 @@ const map = new mapboxgl.Map({
 });
 
 
+// Add zoom and rotation controls 
+map.addControl(new mapboxgl.NavigationControl());
+
+// Add fullscreen option to the map
+map.addControl(new mapboxgl.FullscreenControl());
+
+// Create geocoder variable, only show Toronto area results
+const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
+    countries: "ca",
+    place: "Toronto"
+});
+// Position geocoder on page
+document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
 /*--------------------------------------------------------------------
 Step 2: VIEW GEOJSON POINT DATA ON MAP
@@ -62,8 +77,6 @@ map.on('load', () => {
     let hexgeojson = turf.hexGrid(bboxcoords, 0.5, {units: 'kilometers'});
 
 
-
-
 /*--------------------------------------------------------------------
 Step 4: AGGREGATE COLLISIONS BY HEXGRID
 --------------------------------------------------------------------*/
@@ -71,13 +84,14 @@ Step 4: AGGREGATE COLLISIONS BY HEXGRID
 //      View the collect output in the console. Where there are no intersecting points in polygons, arrays will be empty
 let collishex = turf.collect(hexgeojson, collisiongeojson, '_id', 'values');
 
-let maxcollis = 0;
+//count the number of features inside of each hexagon and identify max value
+let maxcollis = 0; //create an empty variable
 
-collishex.features.forEach((feature) => {
-    feature.properties.COUNT = feature.properties.values.length
-    if (feature.properties.COUNT > maxcollis) {
+collishex.features.forEach((feature) => { //set the loop
+    feature.properties.COUNT = feature.properties.values.length //count the number of collisions
+    if (feature.properties.COUNT > maxcollis) { //when the count is not empty
         console.log(feature);
-        maxcollis = feature.properties.COUNT
+        maxcollis = feature.properties.COUNT //update max collision each time
     }
 });
 
@@ -108,9 +122,59 @@ map.addLayer({
             10, '#F39C12',
             25, '#D35400'
         ],
-        'fill-opacity': 0.4,
+        'fill-opacity': 0.5,
         'fill-outline-color': "white"
     }
+});
+
+//add collision point data as another layer
+map.addSource('collis-point', {
+    type: 'geojson',
+    data: 'https://raw.githubusercontent.com/mia0204/ggr472-lab4/main/data/pedcyc_collision_06-21.geojson'
+});
+
+map.addLayer({
+    'id': 'collision',
+    'type': 'circle',
+    'source': 'collis-point',
+    'paint': {
+        'circle-radius': 3,
+        'circle-color': '#633974',
+        'circle-stroke-width': 1,
+        'circle-stroke-color': 'white'
+    }
+});
+
+//pop-up and click event
+//Switch cursor to pointer when mouse is over collision point
+map.on('mouseenter', 'collision', () => {
+    map.getCanvas().style.cursor = 'pointer'; 
+});
+
+//Switch cursor back when mouse leaves collision point
+map.on('mouseleave', 'collision', () => {
+    map.getCanvas().style.cursor = ''; 
+});
+
+//pop-up showing description of collision point getting clicked
+map.on('click', 'collision', (e) => {
+    new mapboxgl.Popup() 
+        .setLngLat(e.lngLat) 
+        .setHTML("<b>Year of Collision:</b> " + e.features[0].properties.YEAR + "<br>" +
+            "<b>Location (Neighborhood): </b>" + e.features[0].properties.NEIGHBOURHOOD_158 + "<br>" +
+            "<b>Type: </b>" + e.features[0].properties.INVTYPE + "<br>" +
+            "<b>Injury: </b>" + e.features[0].properties.INJURY)//Use click event properties to write text for popup
+        .addTo(map); //Show popup on map
+});
+
+//Interactivity
+//change collision layer display based on check box using setLayoutProperty method
+document.getElementById('layercheck').addEventListener('change', (e) => {
+    map.setLayoutProperty(
+        'collision',
+        'visibility',
+        e.target.checked ? 'visible' : 'none'
+    );
 });
 
 });
