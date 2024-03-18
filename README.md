@@ -15,3 +15,6 @@ Please access the web map [here](https://mia0204.github.io/ggr472-lab4/).
 - Pop-ups on hover for each collision point displaying more details.  
 - Geocoder for searching locations within Toronto area.
 - Checkbox based filter to turn collision point layer on and off to enhance the readability of the map.
+
+## GIS Analysis
+- Using turf.js to create hexgrid and aggregate point data.
