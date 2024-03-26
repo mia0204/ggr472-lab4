@@ -130,7 +130,7 @@ map.addLayer({
 //add collision point data as another layer
 map.addSource('collis-point', {
     type: 'geojson',
-    data: 'https://github.com/mia0204/ggr472-lab4/blob/main/data/pedcyc_collision_06-21.geojson'
+    data: 'https://raw.githubusercontent.com/mia0204/ggr472-lab4/main/data/pedcyc_collision_06-21.geojson'
 });
 
 map.addLayer({
